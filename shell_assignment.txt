@@ -1,0 +1,57 @@
+1.1 	Powershell shows four different columns and one row, displaying the contents of the folder. 
+	The columns are Mode (da---1), LastWriteTime (1/11/2021 10:59 AM), Length (NULL), and Name (shell_magic)
+	The command type Alias connected the name ls to the action Get-ChildItem
+1.2 	The Detailed option show a lot of parameters, which are ecxluded from the 'short'option, it is more elaborate.
+	Attributes can be used to only display files with a certain extension. With the Exclude attribute, a property can be specified. The Filter attribute specifies a filter to qualify the Path parameter.
+	Due to only one file existing in the file that I am working in, what is displayed is exactly the same as in 1.1. I used 'gci -r', 'Get-ChildItem - Recurse', 'gci -Recurse', and 'gci -recurse'. It all gave the same.
+
+2.1	The text is not in different colours. The difference between the folder and the file are the Mode (da---1 for folder, -a---1 for file), the length (NULL for folder, currently 0 for file), and the extension (NULL for folder, .txt for file).
+2.2	The 'Get-Location' command can be used to get the current working directory. 
+	The 'sl ..' command moved the working directory back one folder. 
+	The 'sl <file name>' command moved back the working directory to where I started. 
+	With the 'sl shell_magic' command I was able to set the working directory to the shell_magic folder.
+
+3.1	I first tried 'New-Item hello world', but that gave the following error: New-Item : A positional parameter cannot be found that accepts argument 'world'.
+	So I changed the command to 'New-Item "hello world"', which did work. I think I had to specify that it was text and that it belonged together, with the apostrophes. 
+3.2 	I used the command 'New-Item "hello_world" -ItemType directory' to create the folder hello_world.
+3.3	The programme tells me that access to the path C:\...\shell_magic\hello_world is denied. This arguably because a folder with the same name already exists, and since it is an empty file that we are creating, it cannot distinguish the two items from each other.
+	I used the command 'New-Item "hello_world.bfe"' to create the bfe file. Then I used the 'Rename-Item -Path "C:\...\shell_magic\hello_world.bfe" -NewName "hello_world.txt"' to rename it to a text file. 
+	To move the file I used the command 'Move-Item -Path .\hello_world.txt -Destination .\hello_world'. 
+	To move the file back I used the command 'Move-Item -Path .\hello_world\hello_world.txt -Destination .\shell_magic\hello_world.txt'.
+	Change working directory: 'sl hello_world'.
+	Move file to said working directory: 'Move-Item -Path ..\hello_world.txt -Destination .\hello_world.txt'
+	Move the file back: 'Move-Item -Path .\hello_world.txt -Destination ..\hello_world.txt'
+3.4 	By moving a file you change the location of the single file, and you still only have one file. By copying a file you keep the file at the original location and you can move it to a different location. You therefore have two ifentical versions of the file (at two different locations).
+	Copying only: 'Copy-Item ..\hello_world.txt  -Destination .\hello_world.txt'.
+	Copying and renaming: 'Copy-Item ..\hello_world.txt  -Destination .\world_hello.txt'.
+3.5	Remove in shell_magic: 'ri hello_world.txt'.
+	Remove in hello_world: 'ri .\hello_world\hello_world.txt'
+	With 'ri hello_world' I am not getting an error message, just a question to confirm that all children will be removed with the item. If answered yes, an error comes up saying that it is an NTFS junction point.
+	Remove the entire hello_world folder: 'rm hello_world -Force'.
+
+4.1 	There is not output, because there is nothing in the file. 
+4.2	The Write-Output command sends the specified object down the pipeline to the next command. 
+	The command 'echo "file contents" > file.txt' was used. 
+	After that the command 'echo "more contents" >> file.txt' was used. 
+4.3	To make the list I used the command 'gci C:\Users\kajak | echo > home_contents.list'.
+	The '| oh -p' command is useful to get a quick overview of what is in the file, instead of it loading for a couple of minutes, because you are not interested in looking at everything anyway.
+	
+5.1	The Measure-Object command calculates the numeric properties of objects, and the characters, words, and lines in string objects, such as files of text.		
+	Count the words of file.txt: 'Get-Content .\file.txt | measure -Word'
+	The Measure-Object can see certain properties of a file, such as # of lines, words or characters. Dependent on which ones you want, it can show it to you. 
+	The '| oh -p' command looks at what actually is in the file, and displays the first ~15 lines of the file. 
+	I used 'Get-ChildItem | Measure-Object' to measure the amount of files in the working directory. 
+5.2	I used 'echo 'hello world' > helloworld.txt' and 'echo 'world hello' >> helloworld.txt' to create the file and put the text in it. 
+	I used the command 'Select-String -Path .\helloworld.txt -Pattern "world"' to search for the word 'world'. I got two answers back, as both lines contained the word. 
+	I used the command 'echo "world hello" > worldhello.txt' to create the file. 
+	To find the word 'hello' in both files I used the command 'Get-ChildItem -Recurse -File | Select-String -Pattern 'hello' -SimpleMatch'. This gave me three lines, two from helloworld.txt and one from worldhello.txt.
+	There are 12 other properties for directories with Get-ChildItem, and 14 other for files. I found this on a website with the help of my great friend Google.
+5.3 	I used the command 'Select-String -Path .\helloworld.txt -Pattern "hello"' to find the occurrences of the word 'hello'. 
+	I made the following chain 'Get-ChildItem -Path .\helloworld.txt | Select-String -Pattern "hello" | measure -Word | oh -p'
+	
+6.2	I used the command 'tar.exe -xf aup.tar.gz' to unpack the data.
+6.3	To filter: 'gci -Filter * .\aup'
+	Example of levels of folder: aup -> cohort1 -> s001f -> s001f1.aup 
+	I set the working directory to cohort1, and with the command 'gci | oh -p' I got a view of what files are in the cohort. 
+	Pipeline: 'gc .\count_aup.list | sls .aup | measure'. This gives 1381 .aup files. OR 'gci .\aup\ -Filter *.aup -r | measure', which gives 964 .aup files. 
+			
